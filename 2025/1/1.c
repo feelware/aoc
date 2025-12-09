@@ -17,7 +17,7 @@ int sol(FILE *file) {
     }
 
     else if (dir == 'L') {
-      int inverted_dial = 100 - dial;
+      int inverted_dial = (100 - dial) % 100;
       int sum = inverted_dial + amnt;
       dial = (100 - (sum % 100)) % 100;
     }
