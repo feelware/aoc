@@ -1,61 +1,79 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+#include <stdint.h>
+
+uint64_t max(uint64_t a, uint64_t b) {
+  return (a > b) ? a : b;
+}
+
+uint64_t sum_of_range(uint64_t start, uint64_t end) {
+  uint64_t offset = start - 1;
+  uint64_t n = end - offset;
+  uint64_t top_sum = n * (n + 1) / 2;
+  uint64_t base = offset * n;
+  return top_sum + base;
+}
 
 int sol(FILE *file) {
   char line[256];
+  uint64_t total_sum = 0;
 
   while (fgets(line, sizeof(line), file)) {
-    unsigned start, end;
-    sscanf(line, "%u-%u", &start, &end);
-    
+    uint64_t start, end;
+    sscanf(line, "%lu-%lu", &start, &end);
+
     char start_str[128], end_str[128];
-    sprintf(start_str, "%u", start);    
-    sprintf(end_str, "%u", end);    
+    sprintf(start_str, "%lu", start);    
+    sprintf(end_str, "%lu", end);    
 
     size_t start_len = strlen(start_str);
     size_t end_len = strlen(end_str);
 
-    // printf("%u (%lu) - %u (%lu)\n",
-    //   start, start_len,
-    //   end, end_len
-    // );
+    printf("%lu (%lu) - %lu (%lu)\n",
+      start, start_len,
+      end, end_len
+    );
 
-    size_t cur_len = start_len;
+    size_t len = start_len;
 
-    while (cur_len <= end_len) {
-      if (cur_len % 2) continue;
+    while (len <= end_len) {
+      if (len % 2) {
+        printf("skipping len %lu\n", len);
+        len++;
+        continue;
+      }
+
+      uint64_t inner_num_len = len / 2;
+      uint64_t repgen = pow(10, inner_num_len) + 1;
+      uint64_t range_start = pow(10, (inner_num_len - 1)) * repgen;
+      uint64_t range_end = pow(10, len) - 1;
+
+      if (start > range_start) {
+        uint64_t diff = start % repgen;
+        range_start = start - diff + repgen;
+      }
+
+      if (end < range_end) {
+        uint64_t diff = end % repgen;
+        range_end = end - diff;
+      }
       
-      /*
-        - find shortest repnumber greater than start (right-adjacent)
-        - find largest repnumber less than end (left-adjacent)
-        - compute sum of repnumbers within range
+      uint64_t inner_range_start = range_start / repgen;
+      uint64_t inner_range_end = range_end / repgen;
 
-        ---
+      uint64_t range_sum = repgen * sum_of_range(inner_range_start, inner_range_end);
+      total_sum += range_sum;
 
-        to find repnumbers adjacent to a certain number
-        compute "number % repgen"
+      printf("repnumbers: %lu - %lu (sum: %lu)\n", range_start, range_end, range_sum);
 
-        remember that:
-        
-        "any repnumber % repgen" = 0
-        55 % 11 = 0
-        2323 % 101 = 0
-        567567 % 1001 = 0
-
-        "x (any number) % repgen" = distance between x and left-adjacent repnumber
-        57 % 11 = 2
-        2333 % 101 = 10
-        567570 % 1001 = 3
-
-        repnumber / repgen = number that repeats within repnumber
-        55 / 11 = 5
-        2323 / 101 = 23
-        567567 / 1001 = 567
-      */
-
-      cur_len++;
+      len++;
     }
+
+    printf("\n");
   }
+
+  printf("total sum: %lu\n", total_sum);
 
   return 0;
 }
