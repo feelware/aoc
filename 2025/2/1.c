@@ -44,9 +44,9 @@ int sol(FILE *file) {
         continue;
       }
 
-      uint64_t inner_num_len = len / 2;
-      uint64_t repgen = pow(10, inner_num_len) + 1;
-      uint64_t range_start = pow(10, (inner_num_len - 1)) * repgen;
+      uint64_t half_num_len = len / 2;
+      uint64_t repgen = pow(10, half_num_len) + 1;
+      uint64_t range_start = pow(10, (half_num_len - 1)) * repgen;
       uint64_t range_end = pow(10, len) - 1;
 
       if (start > range_start) {
@@ -59,10 +59,10 @@ int sol(FILE *file) {
         range_end = end - diff;
       }
       
-      uint64_t inner_range_start = range_start / repgen;
-      uint64_t inner_range_end = range_end / repgen;
+      uint64_t half_range_start = range_start / repgen;
+      uint64_t half_range_end = range_end / repgen;
 
-      uint64_t range_sum = repgen * sum_of_range(inner_range_start, inner_range_end);
+      uint64_t range_sum = repgen * sum_of_range(half_range_start, half_range_end);
       total_sum += range_sum;
 
       printf("repnumbers: %lu - %lu (sum: %lu)\n", range_start, range_end, range_sum);
